@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-1CQ4D3VQ3L"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-1CQ4D3VQ3L');
+  </script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>Meeting Cost Tracker: Real-Time Office Waste Meter</title>
+
+  <meta name="description" content="Calculate the financial impact of meetings in real-time. Input hourly rates for attendees to see exactly how much money is being spent every second.">
+  <meta name="keywords" content="meeting cost, corporate waste, productivity tool, hourly rate calculator, time is money, budget tracker, meeting efficiency, ROI">
+  <meta name="author" content="Chris Pirillo">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0f172a">
+
+  <meta property="og:site_name" content="Chris Pirillo's Arcade">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Meeting Cost Tracker: Real-Time Office Waste Meter">
+  <meta property="og:description" content="Calculate the financial impact of meetings in real-time. Input hourly rates for attendees to see exactly how much money is being spent every second.">
+  <meta property="og:url" content="https://pirillo.com/arcade/meeting-cost.html">
+  <meta property="og:image" content="https://pirillo.com/arcade/images/meeting-cost.png">
+  <meta property="og:image:alt" content="Meeting Cost Tracker: Real-Time Office Waste Meter">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@ChrisPirillo">
+  <meta name="twitter:creator" content="@ChrisPirillo">
+  <meta name="twitter:title" content="Meeting Cost Tracker: Real-Time Office Waste Meter">
+  <meta name="twitter:description" content="Calculate the financial impact of meetings in real-time. Input hourly rates for attendees to see exactly how much money is being spent every second.">
+  <meta name="twitter:image" content="https://pirillo.com/arcade/images/meeting-cost.png">
+  <meta name="twitter:domain" content="pirillo.com">
+
+  <link rel="canonical" href="https://pirillo.com/arcade/meeting-cost.html">
+
+  <script type="application/ld+json">{
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Meeting Cost Tracker: Real-Time Office Waste Meter",
+    "description": "Calculate the financial impact of meetings in real-time. Input hourly rates for attendees to see exactly how much money is being spent every second.",
+    "keywords": "meeting cost, corporate waste, productivity tool, hourly rate calculator, time is money, budget tracker, meeting efficiency, ROI",
+    "url": "https://pirillo.com/arcade/meeting-cost.html",
+    "image": "https://pirillo.com/arcade/images/meeting-cost.png",
+    "primaryImageOfPage": {
+      "@type": "ImageObject",
+      "url": "https://pirillo.com/arcade/images/meeting-cost.png"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "Chris Pirillo",
+      "url": "https://pirillo.com",
+      "sameAs": [
+        "https://x.com/ChrisPirillo"
+      ]
+    },
+    "mainEntity": {
+      "name": "Meeting Cost Tracker: Real-Time Office Waste Meter",
+      "description": "Calculate the financial impact of meetings in real-time. Input hourly rates for attendees to see exactly how much money is being spent every second.",
+      "image": "https://pirillo.com/arcade/images/meeting-cost.png",
+      "operatingSystem": "Web Browser",
+      "author": {
+        "@type": "Person",
+        "name": "Chris Pirillo"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      },
+      "@type": "WebApplication",
+      "applicationCategory": "Productivity"
+    }
+  }</script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Removed 'defer' to prevent race condition with inline script execution -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @keyframes fade-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
+    input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
+  </style>
+</head>
+<body class="min-h-screen bg-[#0a0a0c] text-slate-300 font-sans p-4 sm:p-8 flex flex-col items-center">
+  <div class="max-w-3xl w-full space-y-8">
+    
+    <!-- Header -->
+    <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+      <div>
+        <h1 class="text-2xl font-semibold text-white tracking-tight">Meeting Cost</h1>
+        <p class="text-slate-500 text-sm mt-1">Calculating corporate waste in real-time.</p>
+      </div>
+      <div class="flex items-center gap-4">
+        <i data-lucide="alert-triangle" id="alert-icon" class="w-6 h-6 text-slate-700 transition-colors"></i>
+        <button id="btn-help" class="text-slate-500 hover:text-white transition-colors" title="What is this?">
+          <i data-lucide="help-circle" class="w-6 h-6"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- The Meter -->
+    <div class="bg-slate-900/50 border border-slate-800 rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden">
+      <div class="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+      
+      <div class="relative z-10 flex flex-col items-center">
+        <span class="text-sm font-medium uppercase tracking-widest text-slate-500 mb-4 flex items-center gap-2">
+          <i data-lucide="dollar-sign" class="w-4 h-4"></i> Total Cost
+        </span>
+        
+        <div class="text-6xl sm:text-8xl font-black text-white tracking-tighter tabular-nums mb-6 flex items-baseline">
+          <span class="text-4xl sm:text-6xl text-slate-600 mr-2">$</span>
+          <span id="meter-dollars">0</span>
+          <span class="text-4xl sm:text-6xl text-slate-500">.<span id="meter-cents">00</span></span>
+        </div>
+        
+        <div class="flex items-center gap-6 text-sm text-slate-400 bg-slate-950/50 px-6 py-3 rounded-full border border-slate-800/50">
+          <div class="flex items-center gap-2">
+            <i data-lucide="clock" class="w-4 h-4 text-emerald-500"></i>
+            <span id="meter-time" class="tabular-nums font-mono">0s</span>
+          </div>
+          <div class="w-px h-4 bg-slate-800"></div>
+          <div class="flex items-center gap-2" title="Total combined hourly rate">
+            <span id="meter-rate" class="text-rose-400 font-mono tabular-nums">$0.00</span>
+            <span>/ hr</span>
+          </div>
+        </div>
+
+        <div id="milestone-container" class="mt-8 text-sm text-slate-500 italic animate-fade-in hidden">
+          Could have bought: <span id="milestone-text" class="text-slate-300 not-italic font-medium"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="flex justify-center gap-4">
+      <button id="btn-toggle" class="flex items-center gap-2 px-8 py-4 rounded-xl font-semibold transition-all bg-slate-800 text-slate-600 cursor-not-allowed" disabled="">
+        <i data-lucide="play" id="icon-toggle" class="w-5 h-5"></i>
+        <span id="text-toggle">Start Clock</span>
+      </button>
+      
+      <button id="btn-reset" class="flex items-center gap-2 px-6 py-4 rounded-xl font-medium bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled="">
+        <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+        Reset
+      </button>
+    </div>
+
+    <!-- Roster Config -->
+    <div class="bg-slate-900/30 border border-slate-800 rounded-2xl p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-lg font-medium text-white flex items-center gap-2">
+          <i data-lucide="users" class="w-5 h-5 text-slate-400"></i>
+          Attendees
+        </h2>
+        <span class="bg-slate-800 text-slate-300 px-3 py-1 rounded-full text-xs font-medium">
+          <span id="active-count">0</span> Active
+        </span>
+      </div>
+      
+      <div id="attendees-list" class="space-y-3">
+        <!-- Attendees injected via JS -->
+      </div>
+
+      <button id="btn-add" class="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-dashed border-slate-700 text-slate-400 hover:text-white hover:border-slate-500 hover:bg-slate-800/50 transition-all text-sm font-medium">
+        <i data-lucide="plus" class="w-4 h-4"></i>
+        Add Another Victim
+      </button>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden">
+      <div id="modal-content" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-sm w-full shadow-2xl relative">
+        <button id="btn-close-modal" class="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+        
+        <div class="mb-6 pr-6">
+          <h3 class="text-xl font-semibold text-white mb-2">Meeting Cost</h3>
+          <p class="text-slate-400 text-sm">
+            Because time is money, and this meeting is costing a lot of both. Input your attendees' hourly rates and watch the budget vanish in real-time.
+          </p>
+        </div>
+        
+        <div class="space-y-3">
+          <a href="https://pirillo.com/arcade/" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-full p-3 rounded-xl bg-slate-950/50 border border-slate-800/50 hover:border-indigo-500/50 hover:bg-indigo-500/10 text-slate-300 hover:text-indigo-400 transition-all text-sm font-medium">
+            More Apps
+          </a>
+          <a href="https://chris.pirillo.com/" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-full p-3 rounded-xl bg-slate-950/50 border border-slate-800/50 hover:border-indigo-500/50 hover:bg-indigo-500/10 text-slate-300 hover:text-indigo-400 transition-all text-sm font-medium">
+            Follow Chris
+          </a>
+          <a href="https://ctrlaltcreate.live/" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-full p-3 rounded-xl bg-slate-950/50 border border-slate-800/50 hover:border-indigo-500/50 hover:bg-indigo-500/10 text-slate-300 hover:text-indigo-400 transition-all text-sm font-medium">
+            Learn More
+          </a>
+        </div>
+        
+        <div class="mt-6 text-center text-xs text-slate-600">
+          Press <kbd class="font-mono bg-slate-800 px-1.5 py-0.5 rounded text-slate-300">Esc</kbd> to close
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Utilities (Hoisted)
+    function generateId() {
+      return Math.random().toString(36).substr(2, 9);
+    }
+
+    // App State - Initialized with 2 empty attendees
+    let attendees = [
+      { id: generateId(), name: '', rate: '' },
+      { id: generateId(), name: '', rate: '' }
+    ];
+    
+    let isRunning = false;
+    let elapsedMs = 0;
+    let lastTick = null;
+    let reqAnimFrame = null;
+    
+    // Derived Stats
+    let costPerSecond = 0;
+    let activeCount = 0;
+    let totalHourlyRate = 0;
+
+    // DOM Elements
+    const dom = {
+      meterDollars: document.getElementById('meter-dollars'),
+      meterCents: document.getElementById('meter-cents'),
+      meterTime: document.getElementById('meter-time'),
+      meterRate: document.getElementById('meter-rate'),
+      milestoneContainer: document.getElementById('milestone-container'),
+      milestoneText: document.getElementById('milestone-text'),
+      btnToggle: document.getElementById('btn-toggle'),
+      iconToggle: document.getElementById('icon-toggle'),
+      textToggle: document.getElementById('text-toggle'),
+      btnReset: document.getElementById('btn-reset'),
+      activeCountText: document.getElementById('active-count'),
+      attendeesList: document.getElementById('attendees-list'),
+      btnAdd: document.getElementById('btn-add'),
+      modal: document.getElementById('modal'),
+      modalContent: document.getElementById('modal-content'),
+      btnHelp: document.getElementById('btn-help'),
+      btnCloseModal: document.getElementById('btn-close-modal'),
+      alertIcon: document.getElementById('alert-icon')
+    };
+
+    function formatTime(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      
+      if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
+      if (minutes > 0) return `${minutes}m ${seconds}s`;
+      return `${seconds}s`;
+    }
+
+    function getMilestone(cost) {
+      if (cost < 5) return "Literally nothing. Keep talking.";
+      if (cost < 15) return "A decent cup of coffee.";
+      if (cost < 50) return "A nice lunch you could be eating right now.";
+      if (cost < 200) return "A noise-canceling headset to ignore this call.";
+      if (cost < 500) return "A domestic round-trip flight.";
+      if (cost < 1000) return "A flagship smartphone.";
+      if (cost < 3000) return "A very solid used Honda Civic down payment.";
+      return "Someone's monthly rent. Wrap it up.";
+    }
+
+    // Logic updates
+    function calculateStats() {
+      totalHourlyRate = 0;
+      activeCount = 0;
+      
+      attendees.forEach(a => {
+        const rate = parseFloat(a.rate);
+        if (!isNaN(rate) && rate > 0) {
+          totalHourlyRate += rate;
+          activeCount++;
+        }
+      });
+      
+      costPerSecond = totalHourlyRate / 3600;
+      updateUI();
+    }
+
+    function updateMeterDisplay() {
+      const currentCost = elapsedMs * (costPerSecond / 1000);
+      const costString = currentCost.toFixed(2).split('.');
+      
+      dom.meterDollars.textContent = costString[0];
+      dom.meterCents.textContent = costString[1];
+      dom.meterTime.textContent = formatTime(elapsedMs);
+
+      // Alert icon logic
+      if (isRunning && currentCost > 100) {
+        dom.alertIcon.className = "w-6 h-6 text-rose-500 animate-pulse transition-colors";
+      } else {
+        dom.alertIcon.className = "w-6 h-6 text-slate-700 transition-colors";
+      }
+
+      // Milestone logic
+      if (currentCost > 5) {
+        dom.milestoneContainer.classList.remove('hidden');
+        dom.milestoneText.textContent = getMilestone(currentCost);
+      } else {
+        dom.milestoneContainer.classList.add('hidden');
+      }
+    }
+
+    function updateUI() {
+      dom.meterRate.textContent = `$${totalHourlyRate.toFixed(2)}`;
+      dom.activeCountText.textContent = activeCount;
+      
+      // Update toggle button state
+      if (activeCount === 0) {
+        dom.btnToggle.disabled = true;
+        dom.btnToggle.className = "flex items-center gap-2 px-8 py-4 rounded-xl font-semibold transition-all bg-slate-800 text-slate-600 cursor-not-allowed";
+        if (isRunning) toggleTimer(); // Stop if everyone is removed
+      } else {
+        dom.btnToggle.disabled = false;
+        if (isRunning) {
+          dom.btnToggle.className = "flex items-center gap-2 px-8 py-4 rounded-xl font-semibold transition-all bg-slate-800 hover:bg-slate-700 text-white";
+          dom.iconToggle.setAttribute('data-lucide', 'pause');
+          dom.textToggle.textContent = 'Pause Hemorrhage';
+        } else {
+          dom.btnToggle.className = "flex items-center gap-2 px-8 py-4 rounded-xl font-semibold transition-all bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20";
+          dom.iconToggle.setAttribute('data-lucide', 'play');
+          dom.textToggle.textContent = 'Start Clock';
+        }
+      }
+
+      // Reset button state
+      dom.btnReset.disabled = elapsedMs === 0;
+
+      if (window.lucide) lucide.createIcons(); // Refresh icons for any state changes
+      updateMeterDisplay(); // Force a meter update to sync static changes
+    }
+
+    function renderAttendeesList() {
+      dom.attendeesList.innerHTML = '';
+      
+      attendees.forEach((attendee, index) => {
+        const item = document.createElement('div');
+        item.className = "flex items-center gap-3 p-2 rounded-xl bg-slate-950/50 border border-slate-800/50";
+        item.innerHTML = `
+          <div class="flex-1">
+            <input
+              type="text"
+              placeholder="Attendee ${index + 1} (e.g. CEO, Lawyer)"
+              value="${attendee.name}"
+              class="attendee-name w-full bg-transparent border-none text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-0 px-2"
+              data-id="${attendee.id}"
+            />
+          </div>
+          <div class="flex items-center gap-2 border-l border-slate-800 pl-3">
+            <span class="text-slate-500">$</span>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              placeholder="0.00"
+              value="${attendee.rate}"
+              class="attendee-rate w-24 bg-transparent border-none text-sm font-mono text-white placeholder-slate-600 focus:outline-none focus:ring-0"
+              data-id="${attendee.id}"
+            />
+            <span class="text-slate-500 text-sm mr-2">/hr</span>
+          </div>
+          <button class="btn-remove-attendee p-2 text-slate-600 hover:text-rose-400 hover:bg-rose-400/10 rounded-lg transition-colors" data-id="${attendee.id}" title="Remove attendee">
+            <i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i>
+          </button>
+        `;
+        dom.attendeesList.appendChild(item);
+      });
+      
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // Timer Loop
+    function tick(time) {
+      if (lastTick != null) {
+        const delta = time - lastTick;
+        elapsedMs += delta;
+        updateMeterDisplay();
+      }
+      lastTick = time;
+      reqAnimFrame = requestAnimationFrame(tick);
+    }
+
+    function toggleTimer() {
+      if (activeCount === 0) return;
+      
+      isRunning = !isRunning;
+      
+      if (isRunning) {
+        lastTick = null;
+        reqAnimFrame = requestAnimationFrame(tick);
+      } else {
+        if (reqAnimFrame) cancelAnimationFrame(reqAnimFrame);
+        lastTick = null;
+      }
+      updateUI();
+    }
+
+    function resetTimer() {
+      isRunning = false;
+      elapsedMs = 0;
+      lastTick = null;
+      if (reqAnimFrame) cancelAnimationFrame(reqAnimFrame);
+      updateUI();
+    }
+
+    // Modal Handling
+    function toggleModal(show) {
+      if (show) {
+        dom.modal.classList.remove('hidden');
+      } else {
+        dom.modal.classList.add('hidden');
+      }
+    }
+
+    // Event Listeners
+    dom.btnToggle.addEventListener('click', toggleTimer);
+    dom.btnReset.addEventListener('click', resetTimer);
+    
+    dom.btnAdd.addEventListener('click', () => {
+      attendees.push({ id: generateId(), name: '', rate: '' });
+      renderAttendeesList();
+      calculateStats();
+    });
+
+    // Event Delegation for Attendees List
+    dom.attendeesList.addEventListener('input', (e) => {
+      const target = e.target;
+      const id = target.getAttribute('data-id');
+      if (!id) return;
+      
+      const attendee = attendees.find(a => a.id === id);
+      if (!attendee) return;
+
+      if (target.classList.contains('attendee-name')) {
+        attendee.name = target.value;
+      } else if (target.classList.contains('attendee-rate')) {
+        attendee.rate = target.value;
+        calculateStats(); // Recalculate if rates change
+      }
+    });
+
+    dom.attendeesList.addEventListener('click', (e) => {
+      const target = e.target.closest('.btn-remove-attendee');
+      if (!target) return;
+      
+      const id = target.getAttribute('data-id');
+      attendees = attendees.filter(a => a.id !== id);
+      renderAttendeesList();
+      calculateStats();
+    });
+
+    // Modal listeners
+    dom.btnHelp.addEventListener('click', () => toggleModal(true));
+    dom.btnCloseModal.addEventListener('click', () => toggleModal(false));
+    dom.modal.addEventListener('click', () => toggleModal(false));
+    dom.modalContent.addEventListener('click', (e) => e.stopPropagation());
+    
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') toggleModal(false);
+    });
+
+    // Initialization - Run safely after DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+      renderAttendeesList();
+      calculateStats();
+    });
+
+  </script>
+</body>
+</html>
